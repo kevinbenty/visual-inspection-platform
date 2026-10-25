@@ -5,13 +5,34 @@ Run: streamlit run dashboard/streamlit_app.py
 from __future__ import annotations
 
 import base64
+import io
+import mimetypes
 import os
+from pathlib import Path
 
 import pandas as pd
 import requests
 import streamlit as st
 
 API = os.getenv("API_URL", "http://localhost:8000")
+SAMPLES_DIR = os.getenv("SAMPLES_DIR", "")
+IMAGE_TYPES = ["png", "jpg", "jpeg", "bmp", "tif", "tiff"]
+
+
+class SampleImage(io.BytesIO):
+    """A bundled sample image that behaves like a Streamlit upload."""
+
+    def __init__(self, path: Path):
+        super().__init__(path.read_bytes())
+        self.name = path.name
+        self.type = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
+
+
+def sample_images() -> list[Path]:
+    """Sample images shipped with the demo (SAMPLES_DIR), if any."""
+    if not SAMPLES_DIR or not Path(SAMPLES_DIR).is_dir():
+        return []
+    return sorted(p for p in Path(SAMPLES_DIR).iterdir() if p.suffix.lower().lstrip(".") in IMAGE_TYPES)
 
 st.set_page_config(page_title="Visual inspection", layout="wide")
 st.title("Visual inspection")
@@ -38,7 +59,12 @@ with st.sidebar:
 inspect_tab, history_tab = st.tabs(["Inspect an image", "History"])
 
 with inspect_tab:
-    upload = st.file_uploader("Image of a part", type=["png", "jpg", "jpeg", "bmp", "tif", "tiff"])
+    upload = st.file_uploader("Image of a part", type=IMAGE_TYPES)
+    samples = sample_images()
+    if samples and upload is None:
+        choice = st.selectbox("Or try a sample image", ["Choose a sample"] + [p.name for p in samples])
+        if choice != "Choose a sample":
+            upload = SampleImage(Path(SAMPLES_DIR) / choice)
     if upload and st.button("Inspect image", type="primary"):
         with st.spinner("Inspecting"):
             try:
