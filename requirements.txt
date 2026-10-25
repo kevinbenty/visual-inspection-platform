@@ -1,0 +1,14 @@
+# Pin exact versions once your environment works: pip freeze > requirements.lock
+torch>=2.2
+torchvision>=0.17
+numpy>=1.26
+scipy>=1.11
+scikit-learn>=1.4
+pillow>=10.2
+opencv-python-headless>=4.9
+pyyaml>=6.0
+fastapi>=0.110
+uvicorn[standard]>=0.29
+python-multipart>=0.0.9
+pydantic>=2.6
+psutil>=5.9

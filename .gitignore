@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+data/
+models/*
+!models/README.md
+reports/*/*/failures/
+*.db
+.env
+.pytest_cache/
+mlruns/

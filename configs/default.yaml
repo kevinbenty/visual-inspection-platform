@@ -1,0 +1,22 @@
+# Default experiment configuration. Override per run with --config.
+seed: 42
+data:
+  root: data/mvtec_ad          # extracted MVTec AD folder (see README)
+  category: bottle             # one MVTec category per model
+  image_size: 256              # resize shorter side
+  crop_size: 224               # center crop fed to the backbone
+  calibration_fraction: 0.1    # share of train/good held out to set the threshold
+model:
+  name: patchcore              # patchcore | global_knn
+  backbone: wide_resnet50_2
+  layers: [layer2, layer3]
+  coreset_ratio: 0.1           # fraction of patch features kept in memory bank
+  knn_k: 1
+  threshold_percentile: 99.0   # threshold = this percentile of calibration scores
+runtime:
+  device: auto                 # auto | cpu | cuda | mps
+  batch_size: 16
+  num_workers: 2
+output:
+  model_dir: models
+  report_dir: reports
